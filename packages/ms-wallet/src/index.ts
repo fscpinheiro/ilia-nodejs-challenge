@@ -1,6 +1,7 @@
 import express from 'express';
 import { env } from './config';
 import { PrismaTransactionRepository } from './infrastructure/database';
+import { createUserClient } from './infrastructure/grpc';
 import { CreateTransaction, ListTransactions, GetBalance } from './application/use-cases';
 import { TransactionController } from './infrastructure/http/controllers';
 import { createTransactionRoutes } from './infrastructure/http/routes';
@@ -17,9 +18,10 @@ app.get('/health', (req, res) => {
 
 // Dependencies
 const transactionRepository = new PrismaTransactionRepository();
+const userClient = createUserClient(env.usersServiceUrl);
 
 // Use cases
-const createTransaction = new CreateTransaction(transactionRepository);
+const createTransaction = new CreateTransaction(transactionRepository, userClient);
 const listTransactions = new ListTransactions(transactionRepository);
 const getBalance = new GetBalance(transactionRepository);
 

@@ -12,6 +12,7 @@ import {
 import { UserController, AuthController } from './infrastructure/http/controllers';
 import { createUserRoutes } from './infrastructure/http/routes';
 import { errorHandler } from './infrastructure/http/middlewares';
+import { createGrpcServer, startGrpcServer } from './infrastructure/grpc';
 
 const app = express();
 
@@ -49,6 +50,11 @@ app.get('/health', (req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
+// Start HTTP server
 app.listen(env.port, () => {
-  console.log(`ms-users running on port ${env.port}`);
+  console.log(`ms-users HTTP running on port ${env.port}`);
 });
+
+// Start gRPC server
+const grpcServer = createGrpcServer(userRepository);
+startGrpcServer(grpcServer, env.grpcPort);

@@ -4,6 +4,17 @@ import path from 'path';
 import jwt from 'jsonwebtoken';
 import { env } from '../../config';
 
+// gRPC message types
+interface ValidateUserRequest {
+  user_id: string;
+  token: string;
+}
+
+interface ValidateUserResponse {
+  valid: boolean;
+  user_id: string;
+}
+
 const PROTO_PATH = path.resolve(__dirname, '../../../../proto/users.proto');
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
@@ -14,6 +25,7 @@ const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   oneofs: true,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const usersProto = grpc.loadPackageDefinition(packageDefinition) as any;
 
 export interface UserClient {
@@ -28,13 +40,16 @@ export function createUserClient(address: string): UserClient {
       return new Promise((resolve) => {
         const token = jwt.sign({}, env.jwtInternalSecret, { expiresIn: '1m' });
 
-        client.validateUser({ user_id: userId, token }, (err: any, response: any) => {
-          if (err) {
-            resolve(false);
-            return;
-          }
-          resolve(response.valid);
-        });
+        client.validateUser(
+          { user_id: userId, token } as ValidateUserRequest,
+          (err: grpc.ServiceError | null, response?: ValidateUserResponse) => {
+            if (err || !response) {
+              resolve(false);
+              return;
+            }
+            resolve(response.valid);
+          },
+        );
       });
     },
   };

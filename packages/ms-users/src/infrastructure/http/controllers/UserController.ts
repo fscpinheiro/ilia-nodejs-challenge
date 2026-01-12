@@ -50,7 +50,7 @@ export class UserController {
         password,
       });
 
-      return res.status(200).json(result);
+      return res.status(201).json(result);
     } catch (error) {
       if (error instanceof Error && error.message === 'Email already in use') {
         return next(new AppError('Email already in use', 400));
@@ -117,7 +117,7 @@ export class UserController {
 
       await this.deleteUser.execute({ id });
 
-      return res.status(200).json({ message: 'User deleted' });
+      return res.status(204).send();
     } catch (error) {
       if (error instanceof Error && error.message === 'User not found') {
         return next(new AppError('User not found', 404));

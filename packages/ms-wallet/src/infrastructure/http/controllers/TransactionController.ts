@@ -12,7 +12,11 @@ const createTransactionSchema = z.object({
 });
 
 const listTransactionsSchema = z.object({
-  type: z.enum(['CREDIT', 'DEBIT']).optional(),
+  // Normalize query param in case it comes as array (e.g. ?type=CREDIT&type=CREDIT)
+  type: z.preprocess(
+    (val) => (Array.isArray(val) ? val[0] : val),
+    z.enum(['CREDIT', 'DEBIT']).optional(),
+  ),
 });
 
 export class TransactionController {
@@ -38,7 +42,7 @@ export class TransactionController {
         amount,
       });
 
-      return res.status(200).json(result);
+      return res.status(201).json(result);
     } catch (error) {
       if (error instanceof Error && error.message === 'User not found') {
         return next(new AppError('User not found', 404));

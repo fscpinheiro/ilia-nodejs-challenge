@@ -118,6 +118,10 @@ This approach ensures:
 
 All protected endpoints require header: `Authorization: Bearer <token>`
 
+## API Collection
+
+An Insomnia collection with all endpoints is available at [`docs/Ilia_2026-01-12`](docs/Ilia_2026-01-12).
+
 ## Service Communication
 
 ms-wallet validates if user_id exists in ms-users via gRPC (port 50051) before creating a transaction. Internal communication uses JWT with secret ILIACHALLENGE_INTERNAL.

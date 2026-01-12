@@ -52,9 +52,6 @@ export class UserController {
 
       return res.status(201).json(result);
     } catch (error) {
-      if (error instanceof Error && error.message === 'Email already in use') {
-        return next(new AppError('Email already in use', 400));
-      }
       next(error);
     }
   }
@@ -76,9 +73,6 @@ export class UserController {
 
       return res.status(200).json(result);
     } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        return next(new AppError('User not found', 404));
-      }
       next(error);
     }
   }
@@ -104,9 +98,6 @@ export class UserController {
 
       return res.status(200).json(result);
     } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        return next(new AppError('User not found', 404));
-      }
       next(error);
     }
   }
@@ -119,9 +110,6 @@ export class UserController {
 
       return res.status(204).send();
     } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        return next(new AppError('User not found', 404));
-      }
       next(error);
     }
   }

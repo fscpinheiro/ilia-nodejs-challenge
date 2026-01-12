@@ -44,9 +44,6 @@ export class TransactionController {
 
       return res.status(201).json(result);
     } catch (error) {
-      if (error instanceof Error && error.message === 'User not found') {
-        return next(new AppError('User not found', 404));
-      }
       next(error);
     }
   }

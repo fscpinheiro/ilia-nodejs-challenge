@@ -1,6 +1,7 @@
 import { Transaction, TransactionType } from '../../domain/entities';
 import { TransactionRepository } from '../../domain/repositories';
 import { UserClient } from '../../infrastructure/grpc';
+import { UserNotFoundError } from '../../domain/errors';
 
 export interface CreateTransactionInput {
   userId: string;
@@ -26,7 +27,7 @@ export class CreateTransaction {
     // Validate user exists via gRPC
     const userExists = await this.userClient.validateUser(input.userId);
     if (!userExists) {
-      throw new Error('User not found');
+      throw new UserNotFoundError();
     }
 
     const transaction = new Transaction({

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { User } from '../../domain/entities';
 import { UserRepository } from '../../domain/repositories';
+import { EmailAlreadyInUseError } from '../../domain/errors';
 
 export interface CreateUserInput {
   firstName: string;
@@ -23,7 +24,7 @@ export class CreateUser {
     const existingUser = await this.userRepository.findByEmail(input.email);
 
     if (existingUser) {
-      throw new Error('Email already in use');
+      throw new EmailAlreadyInUseError();
     }
 
     const hashedPassword = await bcrypt.hash(input.password, 10);

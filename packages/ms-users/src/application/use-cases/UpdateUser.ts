@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { UserRepository } from '../../domain/repositories';
+import { UserNotFoundError } from '../../domain/errors';
 
 export interface UpdateUserInput {
   id: string;
@@ -23,7 +24,7 @@ export class UpdateUser {
     const existingUser = await this.userRepository.findById(input.id);
 
     if (!existingUser) {
-      throw new Error('User not found');
+      throw new UserNotFoundError();
     }
 
     const updateData: Record<string, string> = {};

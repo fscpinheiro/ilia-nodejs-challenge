@@ -1,4 +1,5 @@
 import { UserRepository } from '../../domain/repositories';
+import { UserNotFoundError } from '../../domain/errors';
 
 export interface GetUserInput {
   id: string;
@@ -18,7 +19,7 @@ export class GetUser {
     const user = await this.userRepository.findById(input.id);
 
     if (!user) {
-      throw new Error('User not found');
+      throw new UserNotFoundError();
     }
 
     return {

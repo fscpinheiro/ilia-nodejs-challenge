@@ -1,9 +1,5 @@
 import { Transaction, TransactionType } from '../../domain/entities';
-import {
-  TransactionRepository,
-  TransactionFilter,
-  BalanceResult,
-} from '../../domain/repositories';
+import { TransactionRepository, TransactionFilter, BalanceResult } from '../../domain/repositories';
 import { prisma } from './prisma';
 
 export class PrismaTransactionRepository implements TransactionRepository {

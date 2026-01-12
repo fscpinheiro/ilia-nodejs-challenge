@@ -30,13 +30,7 @@ const deleteUser = new DeleteUser(userRepository);
 const authenticate = new Authenticate(userRepository, env.jwtSecret);
 
 // Controllers
-const userController = new UserController(
-  createUser,
-  listUsers,
-  getUser,
-  updateUser,
-  deleteUser,
-);
+const userController = new UserController(createUser, listUsers, getUser, updateUser, deleteUser);
 const authController = new AuthController(authenticate);
 
 // Routes

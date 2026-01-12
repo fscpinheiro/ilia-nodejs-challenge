@@ -21,10 +21,7 @@ export interface UserClient {
 }
 
 export function createUserClient(address: string): UserClient {
-  const client = new usersProto.users.UserService(
-    address,
-    grpc.credentials.createInsecure(),
-  );
+  const client = new usersProto.users.UserService(address, grpc.credentials.createInsecure());
 
   return {
     validateUser(userId: string): Promise<boolean> {

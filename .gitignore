@@ -38,3 +38,4 @@ packages/*/prisma/*.db-journal
 # Misc
 *.tsbuildinfo
 .eslintcache
+tmpclaude*

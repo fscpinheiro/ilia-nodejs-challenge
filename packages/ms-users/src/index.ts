@@ -1,6 +1,6 @@
 import express from 'express';
 import { env } from './config';
-import { PrismaUserRepository } from './infrastructure/database';
+import { PrismaUserRepository, seedAdminUser } from './infrastructure/database';
 import {
   CreateUser,
   ListUsers,
@@ -44,11 +44,22 @@ app.get('/health', (req, res) => {
 // Error handler (must be last)
 app.use(errorHandler);
 
-// Start HTTP server
-app.listen(env.port, () => {
-  console.log(`ms-users HTTP running on port ${env.port}`);
-});
+// Start application
+async function bootstrap(): Promise<void> {
+  // Seed admin user if database is empty
+  await seedAdminUser();
 
-// Start gRPC server
-const grpcServer = createGrpcServer(userRepository);
-startGrpcServer(grpcServer, env.grpcPort);
+  // Start HTTP server
+  app.listen(env.port, () => {
+    console.log(`ms-users HTTP running on port ${env.port}`);
+  });
+
+  // Start gRPC server
+  const grpcServer = createGrpcServer(userRepository);
+  startGrpcServer(grpcServer, env.grpcPort);
+}
+
+bootstrap().catch((error) => {
+  console.error('Failed to start application:', error);
+  process.exit(1);
+});

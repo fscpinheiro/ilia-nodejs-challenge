@@ -44,6 +44,10 @@ services:
       DATABASE_URL: postgresql://users_user:users_pass@postgres-users:5432/users_db
       JWT_SECRET: ILIACHALLENGE
       JWT_INTERNAL_SECRET: ILIACHALLENGE_INTERNAL
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      ADMIN_FIRST_NAME: ${ADMIN_FIRST_NAME}
+      ADMIN_LAST_NAME: ${ADMIN_LAST_NAME}
     ports:
       - "3002:3002"
       - "50051:50051"

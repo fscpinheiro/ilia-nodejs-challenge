@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../../domain/repositories';
+import { InvalidCredentialsError } from '../../domain/errors';
 
 export interface AuthenticateInput {
   email: string;
@@ -27,13 +28,13 @@ export class Authenticate {
     const user = await this.userRepository.findByEmail(input.email);
 
     if (!user) {
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsError();
     }
 
     const passwordMatch = await bcrypt.compare(input.password, user.password);
 
     if (!passwordMatch) {
-      throw new Error('Invalid credentials');
+      throw new InvalidCredentialsError();
     }
 
     const token = jwt.sign({ userId: user.id }, this.jwtSecret, {

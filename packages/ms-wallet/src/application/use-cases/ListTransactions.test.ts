@@ -41,7 +41,9 @@ describe('ListTransactions Use Case', () => {
 
     const result = await listTransactions.execute({ type: TransactionType.CREDIT });
 
-    expect(mockTransactionRepository.findAll).toHaveBeenCalledWith({ type: TransactionType.CREDIT });
+    expect(mockTransactionRepository.findAll).toHaveBeenCalledWith({
+      type: TransactionType.CREDIT,
+    });
     expect(result).toHaveLength(1);
     expect(result[0].type).toBe(TransactionType.CREDIT);
   });

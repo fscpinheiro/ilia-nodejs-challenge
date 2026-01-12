@@ -9,13 +9,9 @@ export function createTransactionRoutes(controller: TransactionController): Rout
     controller.create(req, res, next),
   );
 
-  router.get('/transactions', authMiddleware, (req, res, next) =>
-    controller.list(req, res, next),
-  );
+  router.get('/transactions', authMiddleware, (req, res, next) => controller.list(req, res, next));
 
-  router.get('/balance', authMiddleware, (req, res, next) =>
-    controller.balance(req, res, next),
-  );
+  router.get('/balance', authMiddleware, (req, res, next) => controller.balance(req, res, next));
 
   return router;
 }

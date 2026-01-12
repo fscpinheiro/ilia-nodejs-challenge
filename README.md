@@ -71,28 +71,52 @@ curl http://localhost:3001/health
 curl http://localhost:3002/health
 ```
 
+## Authentication Bootstrap
+
+Since all endpoints (except `/auth`) require JWT authentication, this introduces a bootstrap scenario when no users exist. To address this without violating the specification, the Users microservice includes a **database seeder** that creates an initial administrative user during the first startup.
+
+### How it works:
+
+1. On startup, the seeder checks if the database is empty
+2. If empty, it creates an admin user using credentials from environment variables
+3. The admin can then authenticate via `/auth` and create additional users
+
+### Admin credentials (via .env):
+
+```
+ADMIN_EMAIL=admin@example.com
+ADMIN_PASSWORD=admin123
+ADMIN_FIRST_NAME=Admin
+ADMIN_LAST_NAME=User
+```
+
+This approach ensures:
+- No public user registration (all endpoints protected)
+- No hardcoded credentials in source code
+- Credentials configurable per environment
+
 ## APIs
 
 ### Users Service (port 3002)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /auth | Login (public) |
-| POST | /users | Create user |
-| GET | /users | List users |
-| GET | /users/:id | Get user |
-| PUT | /users/:id | Update user |
-| DELETE | /users/:id | Delete user |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | /auth | Login | Public |
+| POST | /users | Create user | Required |
+| GET | /users | List users | Required |
+| GET | /users/:id | Get user | Required |
+| PUT | /users/:id | Update user | Required |
+| DELETE | /users/:id | Delete user | Required |
 
 ### Wallet Service (port 3001)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | /transactions | Create transaction |
-| GET | /transactions | List transactions (filter: ?type=CREDIT or DEBIT) |
-| GET | /balance | Get balance |
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | /transactions | Create transaction | Required |
+| GET | /transactions | List transactions (filter: ?type=CREDIT or DEBIT) | Required |
+| GET | /balance | Get balance | Required |
 
-All endpoints except /auth require header: `Authorization: Bearer <token>`
+All protected endpoints require header: `Authorization: Bearer <token>`
 
 ## Service Communication
 

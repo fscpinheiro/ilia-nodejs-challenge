@@ -10,9 +10,9 @@ export function createUserRoutes(
 
   // Public routes
   router.post('/auth', (req, res, next) => authController.login(req, res, next));
-  router.post('/users', (req, res, next) => userController.create(req, res, next));
 
   // Protected routes
+  router.post('/users', authMiddleware, (req, res, next) => userController.create(req, res, next));
   router.get('/users', authMiddleware, (req, res, next) => userController.list(req, res, next));
   router.get('/users/:id', authMiddleware, (req, res, next) => userController.get(req, res, next));
   router.put('/users/:id', authMiddleware, (req, res, next) => userController.update(req, res, next));

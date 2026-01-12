@@ -45,3 +45,68 @@ This microservice must be a digital Wallet where the user transactions will be s
 
 
 Happy coding! 🤓
+
+---
+
+# Challenge Solution
+
+## How to Run
+
+```bash
+docker-compose up --build
+```
+
+This starts all services:
+- PostgreSQL Wallet (port 5432)
+- PostgreSQL Users (port 5433)
+- ms-users (port 3002)
+- ms-wallet (port 3001)
+
+Migrations run automatically on startup.
+
+To verify:
+
+```bash
+curl http://localhost:3001/health
+curl http://localhost:3002/health
+```
+
+## APIs
+
+### Users Service (port 3002)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /auth | Login (public) |
+| POST | /users | Create user |
+| GET | /users | List users |
+| GET | /users/:id | Get user |
+| PUT | /users/:id | Update user |
+| DELETE | /users/:id | Delete user |
+
+### Wallet Service (port 3001)
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | /transactions | Create transaction |
+| GET | /transactions | List transactions (filter: ?type=CREDIT or DEBIT) |
+| GET | /balance | Get balance |
+
+All endpoints except /auth require header: `Authorization: Bearer <token>`
+
+## Service Communication
+
+ms-wallet validates if user_id exists in ms-users via gRPC (port 50051) before creating a transaction. Internal communication uses JWT with secret ILIACHALLENGE_INTERNAL.
+
+## Local Development (optional)
+
+To run without Docker:
+
+```bash
+npm install
+docker-compose up postgres-wallet postgres-users -d
+npm run prisma:migrate --workspace=ms-wallet
+npm run prisma:migrate --workspace=ms-users
+npm run dev --workspace=ms-users
+npm run dev --workspace=ms-wallet
+```

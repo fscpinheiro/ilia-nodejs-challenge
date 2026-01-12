@@ -35,6 +35,45 @@ services:
       timeout: 5s
       retries: 5
 
+  ms-users:
+    build:
+      context: .
+      dockerfile: packages/ms-users/Dockerfile
+    container_name: ilia-ms-users
+    environment:
+      PORT: 3002
+      GRPC_PORT: 50051
+      DATABASE_URL: postgresql://users_user:users_pass@postgres-users:5432/users_db
+      JWT_SECRET: ILIACHALLENGE
+      JWT_INTERNAL_SECRET: ILIACHALLENGE_INTERNAL
+    ports:
+      - "3002:3002"
+      - "50051:50051"
+    depends_on:
+      postgres-users:
+        condition: service_healthy
+    command: sh -c "npx prisma migrate deploy --schema=./packages/ms-users/prisma/schema.prisma && node packages/ms-users/dist/index.js"
+
+  ms-wallet:
+    build:
+      context: .
+      dockerfile: packages/ms-wallet/Dockerfile
+    container_name: ilia-ms-wallet
+    environment:
+      PORT: 3001
+      DATABASE_URL: postgresql://wallet_user:wallet_pass@postgres-wallet:5432/wallet_db
+      JWT_SECRET: ILIACHALLENGE
+      JWT_INTERNAL_SECRET: ILIACHALLENGE_INTERNAL
+      USERS_SERVICE_URL: ms-users:50051
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres-wallet:
+        condition: service_healthy
+      ms-users:
+        condition: service_started
+    command: sh -c "npx prisma migrate deploy --schema=./packages/ms-wallet/prisma/schema.prisma && node packages/ms-wallet/dist/index.js"
+
 volumes:
   postgres_wallet_data:
   postgres_users_data:

@@ -73,7 +73,7 @@ curl http://localhost:3002/health
 
 ## Authentication Bootstrap
 
-Since all endpoints (except `/auth`) require JWT authentication, this introduces a bootstrap scenario when no users exist. To address this without violating the specification, the Users microservice includes a **database seeder** that creates an initial administrative user during the first startup.
+Since all application endpoints require JWT authentication, this introduces a bootstrap scenario when no users exist. To address this without violating the specification, the Users microservice includes a **database seeder** that creates an initial administrative user during the first startup.
 
 ### How it works:
 
@@ -81,7 +81,9 @@ Since all endpoints (except `/auth`) require JWT authentication, this introduces
 2. If empty, it creates an admin user using credentials from environment variables
 3. The admin can then authenticate via `/auth` and create additional users
 
-### Admin credentials (via .env):
+### Admin credentials (via .env or .env.example):
+
+> Credentials shown below are for local development only.
 
 ```
 ADMIN_EMAIL=admin@example.com
@@ -94,6 +96,10 @@ This approach ensures:
 - No public user registration (all endpoints protected)
 - No hardcoded credentials in source code
 - Credentials configurable per environment
+
+## Identifier Strategy
+
+UUIDs are used as primary identifiers to ensure uniqueness across independent microservices and databases.
 
 ## APIs
 
@@ -138,3 +144,26 @@ npm run prisma:migrate --workspace=ms-users
 npm run dev --workspace=ms-users
 npm run dev --workspace=ms-wallet
 ```
+
+## Known Limitations
+
+- **Admin seeder race condition**: If multiple instances of ms-users start simultaneously with an empty database, more than one admin could be created. This is an accepted trade-off to avoid over-engineering with distributed locks for a simple seeder.
+- **Cross-service consistency**: There is a potential race condition between user validation in ms-users and transaction creation in ms-wallet. In production, this could be mitigated with event-driven approaches or soft deletes.
+- **Idempotency on transaction creation**: The `POST /transactions` endpoint does not currently support idempotency keys. In scenarios involving network retries or client-side timeouts, duplicate transactions could be created. In production, this could be addressed by requiring an `Idempotency-Key` header and enforcing uniqueness at the database level.
+- **No pagination**: List endpoints (`GET /users`, `GET /transactions`) return all records. For large datasets, pagination would be needed.
+- **No refresh tokens**: JWT tokens expire after 1 day. Users must re-authenticate after expiration.
+- **Transactions are immutable**: There are no endpoints to update or delete transactions, following financial audit best practices.
+- **Balance per user only**: The `/balance` endpoint returns balance for the authenticated user. Global aggregations are not supported.
+
+## Future Improvements
+
+- **Automated tests**: Unit tests for use cases and integration tests for APIs
+- **Pagination**: Add limit/offset or cursor-based pagination to list endpoints
+- **Refresh tokens**: Implement token refresh mechanism to improve UX
+- **Rate limiting**: Protect endpoints against abuse
+- **Duplicate transaction protection**: In real-world financial systems, additional safeguards prevent rapid consecutive transactions with identical attributes within a short time window. This challenge intentionally avoids such heuristics to keep the transaction model deterministic and simple.
+- **OpenAPI/Swagger**: Auto-generated API documentation
+- **Structured logging**: Add correlation IDs for request tracing across services
+- **Metrics**: Prometheus/Grafana for monitoring and alerting
+- **Secrets management**: Use a dedicated secrets manager (e.g. AWS Secrets Manager, Vault) instead of environment files in production
+- **Service mesh (optional)**: In larger production environments, a service mesh could provide mTLS, observability, and traffic management between microservices

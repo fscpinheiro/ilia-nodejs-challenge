@@ -3,7 +3,7 @@ import * as protoLoader from '@grpc/proto-loader';
 import path from 'path';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../../domain/repositories';
-import { env } from '../../config';
+import { env, logger } from '../../config';
 
 // gRPC message types
 interface ValidateUserRequest {
@@ -67,9 +67,10 @@ export function createGrpcServer(userRepository: UserRepository): grpc.Server {
 export function startGrpcServer(server: grpc.Server, port: number): void {
   server.bindAsync(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure(), (err, boundPort) => {
     if (err) {
-      console.error('Failed to start gRPC server:', err);
+      logger.error('Failed to start gRPC server:');
+      logger.error(err);
       return;
     }
-    console.log(`gRPC server running on port ${boundPort}`);
+    logger.info(`gRPC server running on port ${boundPort}`);
   });
 }

@@ -1,19 +1,19 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from './prisma';
-import { env } from '../../config';
+import { env, logger } from '../../config';
 
 export async function seedAdminUser(): Promise<void> {
   // Check if database is empty
   const userCount = await prisma.user.count();
 
   if (userCount > 0) {
-    console.log('Database already has users, skipping seed');
+    logger.info('Database already has users, skipping seed');
     return;
   }
 
   // Validate admin credentials are configured
   if (!env.adminEmail || !env.adminPassword || !env.adminFirstName || !env.adminLastName) {
-    console.warn('Admin credentials not configured in environment variables, skipping seed');
+    logger.warn('Admin credentials not configured in environment variables, skipping seed');
     return;
   }
 
@@ -29,5 +29,5 @@ export async function seedAdminUser(): Promise<void> {
     },
   });
 
-  console.log(`Admin user created: ${env.adminEmail}`);
+  logger.info(`Admin user created: ${env.adminEmail}`);
 }

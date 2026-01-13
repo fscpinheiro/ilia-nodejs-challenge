@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { DomainError } from '../../../domain/errors';
+import { logger } from '../../../config';
 
 export class AppError extends Error {
   constructor(
@@ -20,7 +21,7 @@ export function errorHandler(err: Error, req: Request, res: Response, _next: Nex
     return res.status(err.statusCode).json({ error: err.message });
   }
 
-  console.error(err);
+  logger.error(err);
 
   return res.status(500).json({ error: 'Internal server error' });
 }

@@ -1,5 +1,5 @@
 import express from 'express';
-import { env } from './config';
+import { env, logger } from './config';
 import { PrismaTransactionRepository } from './infrastructure/database';
 import { createUserClient } from './infrastructure/grpc';
 import { CreateTransaction, ListTransactions, GetBalance } from './application/use-cases';
@@ -39,5 +39,5 @@ app.use(createTransactionRoutes(transactionController));
 app.use(errorHandler);
 
 app.listen(env.port, () => {
-  console.log(`ms-wallet running on port ${env.port}`);
+  logger.info(`ms-wallet running on port ${env.port}`);
 });

@@ -154,6 +154,7 @@ npm run dev --workspace=ms-wallet
 - **No refresh tokens**: JWT tokens expire after 1 day. Users must re-authenticate after expiration.
 - **Transactions are immutable**: There are no endpoints to update or delete transactions, following financial audit best practices.
 - **Balance per user only**: The `/balance` endpoint returns balance for the authenticated user. Global aggregations are not supported.
+- **Concurrent balance updates**: Concurrent debit operations could lead to inconsistent balance calculations without database-level locking or transactional isolation. This challenge prioritizes simplicity over strict concurrency controls.
 
 ## Future Improvements
 
@@ -167,3 +168,8 @@ npm run dev --workspace=ms-wallet
 - **Metrics**: Prometheus/Grafana for monitoring and alerting
 - **Secrets management**: Use a dedicated secrets manager (e.g. AWS Secrets Manager, Vault) instead of environment files in production
 - **Service mesh (optional)**: In larger production environments, a service mesh could provide mTLS, observability, and traffic management between microservices
+- **Time consistency**: In production, transaction timestamps should be generated and normalized using a consistent time source (e.g. UTC or database time) to avoid clock skew issues across services
+- **API versioning**: Introduce explicit API versioning (e.g. `/v1`) to allow backward-compatible evolution of the public endpoints
+- **Contract evolution**: As internal gRPC contracts evolve, backward-compatible schema changes would be required to avoid breaking inter-service communication
+- **Audit trail**: While transactions are immutable, a production system would typically include an append-only audit log for security and compliance purposes
+- **Graceful shutdown**: Implement graceful shutdown handling to ensure in-flight requests are completed before service termination

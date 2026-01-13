@@ -1,5 +1,5 @@
 import express from 'express';
-import { env } from './config';
+import { env, logger } from './config';
 import { PrismaUserRepository, seedAdminUser } from './infrastructure/database';
 import {
   CreateUser,
@@ -51,7 +51,7 @@ async function bootstrap(): Promise<void> {
 
   // Start HTTP server
   app.listen(env.port, () => {
-    console.log(`ms-users HTTP running on port ${env.port}`);
+    logger.info(`ms-users HTTP running on port ${env.port}`);
   });
 
   // Start gRPC server
@@ -60,6 +60,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error) => {
-  console.error('Failed to start application:', error);
+  logger.error('Failed to start application:');
+  logger.error(error);
   process.exit(1);
 });
